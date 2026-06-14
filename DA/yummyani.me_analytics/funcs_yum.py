@@ -1131,7 +1131,7 @@ class RequestParser:
             v_player = vid.get('data').get('player')
             v_player_id = vid.get('data').get('player_id')
             v_dubbing = vid.get('data').get('dubbing')
-            v_date = datetime.fromtimestamp(vid.get('date'))
+            v_date = (datetime.fromtimestamp(vid.get('date')) if vid.get('date') else None)
             v_index = vid.get('index')
             v_views = vid.get('views')
             v_durations = vid.get('duration')
@@ -1151,7 +1151,7 @@ class RequestParser:
             com_childrens = comment.get('children_count')
             com_likes = comment.get('likes')
             com_dislikes = comment.get('dislikes')
-            com_time = datetime.fromtimestamp(comment.get('time'))
+            com_time = (datetime.fromtimestamp(comment.get('time')) if comment.get('time') else None)
 
             row = (anime_id, com_id, com_text, com_childrens,
                    com_likes, com_dislikes, com_time)
