@@ -1,205 +1,13 @@
 import requests
-import cloudscraper
-from bs4 import BeautifulSoup
+# import cloudscraper
+# from bs4 import BeautifulSoup
 import time
 from datetime import datetime
-import csv
+# import csv
 
 import psycopg2
 
-############################
-# вариант сохранения данных в csv файлы
 
-class CsvFuncs:
-    def create_file_anime_2():
-        '''
-        создает (перезаписывает) пустой файл anime_ids
-        '''
-
-        with open("anime_ids.csv", "w", newline="", encoding="utf-8") as file:
-
-            writer = csv.writer(file)
-
-            writer.writerow([
-                "anime_id",
-                "title",
-                "anime_url",
-                "views",
-                'type',
-                'rating_avg',
-            ])
-
-
-    def collect_anime_ids():
-        '''
-        Заполнение файла anime_ids.csv
-        '''
-
-        headers = {
-            "User-Agent": (
-                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
-                "AppleWebKit/537.36 (KHTML, like Gecko) "
-                "Chrome/124.0 Safari/537.36"
-            )
-            }
-
-        anime_counter = 0
-        page = 1
-
-        scraper = cloudscraper.create_scraper()
-
-        while True:
-
-            url = f"https://old.yummyani.me/catalog?page={page}"
-
-            try:
-                response = scraper.get(
-                    url,
-                    timeout=30
-                )
-
-            except Exception as e:
-                print("Ошибка:", e)
-                time.sleep(30)
-                continue
-
-            if response.status_code != 200:
-                print("Ошибка:", response.status_code, response.text)
-                break
-
-            soup = BeautifulSoup(response.text, "html.parser")
-
-            page_anime_list = soup.select(".anime-column")
-
-
-            if not page_anime_list:
-                print("Больше аниме нет.")
-                break
-
-            with open("anime_ids.csv", "a", newline="", encoding="utf-8") as file:
-
-                writer = csv.writer(file)
-
-                for anime in page_anime_list:
-                    anime_id = anime.get('data-anime-id')
-                    title = anime.select('.anime-title')[0].text
-                    anime_url = anime.select('.anime-title')[0].get('href')[14:]
-                    views = anime.select_one(".views-count").get_text(strip=True)
-                    anime_type = anime.select_one(".anime-column-info > div").get_text(strip=True)
-                    rating = anime.select_one(".main-rating").get_text(strip=True)
-
-                    writer.writerow([anime_id, title, anime_url, views, anime_type, rating])
-                    anime_counter += 1
-
-            time.sleep(2)
-
-            page += 1
-
-        print(f'собрано {anime_counter} аниме')
-
-
-    def create_anime_main():
-        '''
-        создает (перезаписывает) пустой файл main.csv
-        '''
-        with open("files/main.csv", "w", newline="", encoding="utf-8") as file:
-
-            writer = csv.writer(file)
-
-            writer.writerow([
-                'anime_id',
-                'title',
-                'description',
-                'duration',
-                'anime_url',
-                'year',
-                'season',
-                'views',
-                'anime_status_ru',
-                'type_ru',
-                'rating_place_over_all',
-                'rating_place_over_category', 
-                'other_anime_names',
-                'creators',
-                'creadors_ids',
-                'studios',
-                'studios_id',
-                'original',
-                'episodes_count',
-                'comments_count',
-                'lists_count'
-            ])
-
-    def create_main_ratings():
-        with open("files/main_ratings.csv", "w", newline="", encoding="utf-8") as file:
-
-            writer = csv.writer(file)
-
-            writer.writerow([
-                'anime_id',
-                'rating_avg',
-                'rating_counts',
-                'kp_rating', 
-                'shikimori_rating',
-                'myanimelist_rating',
-                'worldart_rating'
-            ])
-
-
-    def create_main_genres():
-        with open("files/main_genres.csv", "w", newline="", encoding="utf-8") as file:
-
-            writer = csv.writer(file)
-
-            writer.writerow([
-                'anime_id',
-                'title_ru',
-                'title_en',
-                'genre_id',
-                'genre_url'
-            ])
-
-
-    def create_min_ages():
-        with open("files/min_ages.csv", "w", newline="", encoding="utf-8") as file:
-
-            writer = csv.writer(file)
-
-            writer.writerow([
-                'anime_id',
-                'age_ru',
-                'age_en',
-                'age_id'
-            ])
-
-
-    def create_other_ids():
-        with open("files/other_ids.csv", "w", newline="", encoding="utf-8") as file:
-
-            writer = csv.writer(file)
-
-            writer.writerow([
-                'ya_anime_id',
-                'myanimelist_id',
-                'shikimori_id'
-            ])
-
-
-    def create_viewing_orders():
-        with open("files/viewing_orders.csv", "w", newline="", encoding="utf-8") as file:
-
-            writer = csv.writer(file)
-
-            writer.writerow([
-                'anime_id_1',
-                'anime_id_2',
-                'anime_title_2',
-                'anime_url_2', 
-                'anime_2_status_ru',
-                'anime_2_type_ru',
-                'anime_2_year',
-                'anime_2_rating'
-            ])
 
 class RequestsAnimeMain:
 
@@ -211,7 +19,6 @@ class RequestsAnimeMain:
         }
         self.session = requests.Session()
         self.session.headers.update(self.headers)
-
 
     def request_anime_ids(self, year, status, skip, skip_limit, retrays=3):
 
@@ -239,7 +46,6 @@ class RequestsAnimeMain:
         
         return None
 
-
     def request_anime_data(self, anime_id, retrays=3):
 
         for i in range(retrays):
@@ -261,7 +67,6 @@ class RequestsAnimeMain:
         
         return None
     
-    
     def request_anime_rates_distrb(self, anime_id, retrays=3):
         for i in range(retrays):
             try:
@@ -282,7 +87,6 @@ class RequestsAnimeMain:
         
         return None
 
-    
     def request_reccomendation(self, anime_id, retrays=3):
         for i in range(retrays):
             try:
@@ -303,7 +107,6 @@ class RequestsAnimeMain:
         
         return None
     
-
     def request_vidos_inf(self, anime_id, retrays=3):
         for i in range(retrays):
             try:
@@ -324,7 +127,6 @@ class RequestsAnimeMain:
         
         return None
     
-
     def request_comments_inf(self, anime_id, skip, skip_step, retrays=3):
         for i in range(retrays):
             try:
@@ -348,9 +150,9 @@ class RequestsAnimeMain:
         return None
 
 
-
 ############################
 # вариант подгрузки в бд
+
 
 class PostgresDB:
     def __init__(self, host, db, user, password):
@@ -379,7 +181,6 @@ class PostgresDB:
             'comments'
         ]
 
-
     def create_anime_ids_table(self):
         self.cursor.execute(
         '''
@@ -394,7 +195,6 @@ class PostgresDB:
         );
         ''')
         self.cursor.connection.commit()
-
 
     def create_anime_main_table(self):
         self.cursor.execute(
@@ -420,7 +220,6 @@ class PostgresDB:
         ''')
         self.cursor.connection.commit()
         
-
     def create_anime_ratings_table(self):
         self.cursor.execute(
         '''
@@ -545,7 +344,6 @@ class PostgresDB:
         ''')
         self.cursor.connection.commit()
 
-
     def create_anime_recommendations_table(self):
         self.cursor.execute(
         '''
@@ -558,14 +356,13 @@ class PostgresDB:
         ''')
         self.cursor.connection.commit()
 
-
     def create_anime_videos_table(self):
         self.cursor.execute(
         '''
         CREATE TABLE videos (
             anime_id BIGINT,
             video_id BIGINT ,
-            episode_number INTEGER,
+            episode_number TEXT,
             player_id  INTEGER,
             player_name TEXT,
             dubbing_name TEXT,
@@ -594,7 +391,6 @@ class PostgresDB:
         ''')
         self.cursor.connection.commit()
 
-
     def drop_table(self, table_name):
         if table_name in self.tables:
             self.cursor.execute(
@@ -607,7 +403,6 @@ class PostgresDB:
     def close(self):
         self.cursor.close()
         self.conn.close()
-
 
     def load_anime_ids(self, ids_list):
         sql_anime_ids = '''
@@ -633,6 +428,23 @@ class PostgresDB:
         self.cursor.executemany(sql_anime_ids, ids_list)
         self.cursor.connection.commit()
 
+    def get_anime_ids_from(self, start_anime_id=None):
+
+        if start_anime_id:
+            self.cursor.execute('''
+                SELECT anime_id
+                FROM anime_ids
+                WHERE anime_id >= %s
+                ORDER BY anime_id
+            ''', (start_anime_id,))
+        else:
+            self.cursor.execute('''
+                SELECT anime_id
+                FROM anime_ids
+                ORDER BY anime_id
+            ''')
+
+        return [row[0] for row in self.cursor.fetchall()]
 
     def load_anime_main(self, row):
 
@@ -705,7 +517,6 @@ class PostgresDB:
         self.cursor.execute(sql_operation, row)
         self.cursor.connection.commit()
 
-
     def load_genres_main(self, rows):
 
         sql_operation = '''
@@ -745,7 +556,6 @@ class PostgresDB:
         self.cursor.execute(sql_operation, row)
         self.cursor.connection.commit()
 
-
     def load_other_ids_main(self, row):
 
         sql_operation = '''
@@ -762,7 +572,6 @@ class PostgresDB:
         '''
         self.cursor.execute(sql_operation, row)
         self.cursor.connection.commit()
-
 
     def load_viewing_orders_main(self, rows):
 
@@ -790,7 +599,6 @@ class PostgresDB:
         self.cursor.executemany(sql_operation, rows)
         self.cursor.connection.commit()
 
-
     def load_creators_main(self, rows):
 
         sql_operation = '''
@@ -806,7 +614,6 @@ class PostgresDB:
         '''
         self.cursor.executemany(sql_operation, rows)
         self.cursor.connection.commit()
-
 
     def load_studios_main(self, rows):
 
@@ -824,7 +631,6 @@ class PostgresDB:
         self.cursor.executemany(sql_operation, rows)
         self.cursor.connection.commit()
 
-
     def load_other_titles_main(self, rows):
 
         sql_operation = '''
@@ -838,7 +644,6 @@ class PostgresDB:
         '''
         self.cursor.executemany(sql_operation, rows)
         self.cursor.connection.commit()
-
 
     def load_ratings_distributions(self, row):
 
@@ -876,7 +681,6 @@ class PostgresDB:
         self.cursor.execute(sql_operation, row)
         self.cursor.connection.commit()
 
-
     def load_recommendations(self, rows):
 
         sql_operation = '''
@@ -892,7 +696,6 @@ class PostgresDB:
         '''
         self.cursor.executemany(sql_operation, rows)
         self.cursor.connection.commit()
-
 
     def load_videos(self, rows):
 
@@ -926,7 +729,6 @@ class PostgresDB:
         '''
         self.cursor.executemany(sql_operation, rows)
         self.cursor.connection.commit()
-
 
     def load_comments(self, rows):
 
@@ -1128,9 +930,9 @@ class RequestParser:
         for vid in vids_info:
             v_id = vid.get('video_id')
             v_number = vid.get('number')
-            v_player = vid.get('data').get('player')
-            v_player_id = vid.get('data').get('player_id')
-            v_dubbing = vid.get('data').get('dubbing')
+            v_player = vid.get('data', {}).get('player')
+            v_player_id = vid.get('data', {}).get('player_id')
+            v_dubbing = vid.get('data', {}).get('dubbing')
             v_date = (datetime.fromtimestamp(vid.get('date')) if vid.get('date') else None)
             v_index = vid.get('index')
             v_views = vid.get('views')
@@ -1182,7 +984,7 @@ class DataCollector:
 
                     while True:
                         anime_ids = self.request_class.request_anime_ids(year, status, skip, skip_step)
-                        time.sleep(1)
+                        time.sleep(1.0)
 
                         if (anime_ids is None) or (not anime_ids):
                             break
@@ -1199,6 +1001,7 @@ class DataCollector:
                 while True:
                     year = None
                     anime_ids = self.request_class.request_anime_ids(year, status, skip, skip_step)
+                    time.sleep(1.0)
 
                     if (anime_ids is None) or (not anime_ids):
                         break
@@ -1208,7 +1011,6 @@ class DataCollector:
                     self.db_class.load_anime_ids(ids_list)
                     anime_counter += len(ids_list)
                     skip += skip_step
-                    time.sleep(1)
                             
         print(f'собрано {anime_counter} аниме')
 
@@ -1269,12 +1071,12 @@ class DataCollector:
         while True:
             comments_list = self.request_class.request_comments_inf(anime_id, skip, skip_step)
             time.sleep(1.0)
-            comments_counter += len(comments_list)
 
             if (comments_list is None) or (not comments_list):
                 break
             else:
                 self.db_class.load_comments(RequestParser.parse_comments_request(anime_id, comments_list))
+                comments_counter += len(comments_list)
             skip += skip_step
 
         if comments_counter == 0:
