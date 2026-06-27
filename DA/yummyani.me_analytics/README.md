@@ -9,7 +9,7 @@
 Данные собраны с [сайта](https://ru.yummyani.me) и сложены в PostgreS
 
 Структура бд
-![Схема бд](/imgs/bd_scheme.png)
+![Схема бд](imgs/bd_scheme.png)
 
 
 
