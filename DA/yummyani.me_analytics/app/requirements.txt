@@ -1,9 +1,0 @@
-fastapi
-uvicorn
-numpy
-pandas
-scikit-learn==1.8.0
-joblib==1.5.3
-faiss-cpu
-pydantic
-pyarrow
