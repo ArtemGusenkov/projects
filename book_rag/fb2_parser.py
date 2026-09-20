@@ -16,7 +16,7 @@ def update_dict(full_texts, title_name, chapter_name_list, data):
                 "chapter": " - ".join(chapter_name_list) or title_name,
                 "text": "\n\n".join(full_texts),
             })
-            full_texts = []
+            full_texts.clear()
 
 
 def visit(child, chapter_name_list, title_name, full_texts, data):

@@ -1,5 +1,5 @@
 from vectors_bd import create_q_client
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from typing import Literal
 from langchain_openrouter import ChatOpenRouter
 from langchain.agents import create_agent
@@ -8,7 +8,7 @@ from dotenv import load_dotenv
 class answer(BaseModel):
     decision: Literal['ответ найден', 'нет ответа']
     answer: str
-    points: list[str]
+    points: list[int] = Field(description='указывать тут только id чанков, которые подтверждают ответ')
 
 def search(qclient, bd_name, embedder, question, k=10):
     if len(question) == 0:
@@ -35,9 +35,9 @@ def answer_question(question, points):
     в книге пишут Уотсон вместо распространенного Ватсон, учитывай это при ответе на вопросы
     ты можешь использовать факты только из найденых фрагментов
     ничего не придумывай и не добавляй сведений из своей памяти
-    если фрагменты не подтверждают ответ на вопрос, укажи decision='нет ответа' и ответь что переданные фрагменты не помогают ответить на вопрос
-    в ответе не цитируй поностью отрывки, а приводи краткий пересказ 
-    но источники возвращай полностью в том же виде, в котором и получил
+    если фрагменты не подтверждают ответ на вопрос, укажи decision='нет ответа' и ответь что переданные фрагменты не помогают ответить на вопрос 
+    для найденого ответа возвращай id чанков в points
+    в ответе не печатай источники полностью, а кратко пересказывай с указанием id источника
     ''')
     result = agent.invoke({
         'messages':[
@@ -53,7 +53,7 @@ def answ_print(answ):
     if len(answ.points) != 0:
         print('источники: ')
         for i in answ.points:
-            print('    -', i)
+            print('    chank_id:', i)
 
 
 
