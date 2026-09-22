@@ -1,12 +1,13 @@
 import os
 
-from dotenv import load_dotenv 
+from dotenv import load_dotenv
 from langchain_openai import OpenAIEmbeddings
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from qdrant_client import QdrantClient, models
 
 from fb2_parser import parse_fb2
 
+TEXTS_LOCATION = r'../texts/'
 
 def make_chunks(data, size=1000, overlap=100):
     splitter = RecursiveCharacterTextSplitter(
@@ -36,9 +37,16 @@ def create_q_client():
 
 def create_bd(q_client, bd_name, vec_size=1536):
     if not q_client.collection_exists(bd_name):
-        q_client.create_collection(bd_name, vectors_config=models.VectorParams(
-            size=vec_size, distance=models.Distance.COSINE,
-        ))
+        q_client.create_collection(
+            bd_name, 
+            vectors_config={'embs': models.VectorParams(
+                size=vec_size, 
+                distance=models.Distance.COSINE,
+            )},
+            sparse_vectors_config={'bm25': models.SparseVectorParams(
+                modifier=models.Modifier.IDF
+            )}
+        )
 
 def load_vecs(q_client, bd_name, chunks, emb):
     ids = [i for i in range(len(chunks))]
@@ -55,7 +63,14 @@ def load_vecs(q_client, bd_name, chunks, emb):
                 points=[
                     models.PointStruct(
                         id=id,
-                        vector=vector,
+                        vector={
+                            'embs' : vector,
+                            'bm25' : models.Document(
+                                text = chunk['text'],
+                                model='qdrant/bm25',
+                                options={"language": "russian"}
+                            )
+                        },
                         payload={
                             **chunk,
                             'chunk_id' : id
@@ -68,8 +83,8 @@ def load_vecs(q_client, bd_name, chunks, emb):
 def bd_pipeline():
     load_dotenv()
     all_books = []
-    for book in os.listdir(r'texts/'):
-        output = parse_fb2('texts/' + book)
+    for book in os.listdir(TEXTS_LOCATION):
+        output = parse_fb2(TEXTS_LOCATION + book)
         all_books.extend(output)
 
     all_chunks = make_chunks(all_books)

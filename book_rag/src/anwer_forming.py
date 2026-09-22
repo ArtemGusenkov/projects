@@ -1,4 +1,3 @@
-from vectors_bd import create_q_client
 from pydantic import BaseModel, Field
 from typing import Literal
 from langchain_openrouter import ChatOpenRouter
@@ -9,20 +8,7 @@ class answer(BaseModel):
     decision: Literal['ответ найден', 'нет ответа']
     answer: str
     points: list[int] = Field(description='указывать тут только id чанков, которые подтверждают ответ')
-
-def search(qclient, bd_name, embedder, question, k=10):
-    if len(question) == 0:
-        raise ValueError("пустой вопрос")
-
-    vec_question = embedder.embed_query(question)
-
-    response = qclient.query_points(
-        collection_name=bd_name, 
-        query=vec_question,
-        limit=k,
-        with_payload=True
-    )
-    return [{**point.payload, "score":point.score} for point in response.points]
+    
 
 def answer_question(question, points):
     load_dotenv()
