@@ -15,9 +15,9 @@ def make_chunks(data, size=1000, overlap=100):
         separators=["\n\n", "\n", ". ", " ", ""],
     )
     return [
-        {**record, "text": text, "part": part}
+        {**record, "text": text}
         for record in data
-        for part, text in enumerate(splitter.split_text(record["text"]), 1)
+        for text in splitter.split_text(record["text"])
     ]
 
 def embedder():
