@@ -41,6 +41,7 @@ def llm_question_generation(chunks_list):
     - для генерации вопроса можешь использовать только переданный фрагмент текста
     - придуманный вопрос должен полностью основываться на переданном фрагменте
     - вопрос должены быть понятен без прочтения фрагмента
+    - не составляй вопросы в виде "... в этом фрагменте ...?", вопрос должен быть самодостаточным и понятным 
     - не используй свою память, ничего не придумывай и ничего не добавляй
     '''
 
@@ -62,12 +63,12 @@ def llm_question_generation(chunks_list):
 
 
 def save_2_json(data_list):
-    with open(r'../eval_dataset/golden_dataset.jsonl', 'w') as f:
+    with open(r'../eval_dataset/golden_dataset.jsonl', 'w', encoding='utf-8') as f:
         for row in data_list:
             f.write(row+'\n')
 
 
-def create_golden_dataset():
-    chunk_list = random_chunks(n=2)
+def create_golden_dataset(n=100):
+    chunk_list = random_chunks(n=n)
     resp = llm_question_generation(chunk_list)
     save_2_json(resp)
