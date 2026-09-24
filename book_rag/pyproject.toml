@@ -12,7 +12,9 @@ dependencies = [
     "langgraph>=1.2.11",
     "langsmith>=0.12.6",
     "openrouter>=0.11.46",
+    "pandas>=3.0.6",
     "pydantic>=2.12.5",
+    "pytest>=9.1.1",
     "python-dotenv>=1.2.3",
     "qdrant-client>=1.19.1",
 ]
