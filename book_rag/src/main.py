@@ -2,7 +2,7 @@ import os
 import sys
 from fb2_parser import parse_fb2
 
-from vectors_bd import bd_pipeline, embedder, create_q_client
+from vectors_bd import embedder, create_q_client
 from retrieval import retriever_search
 from answer_forming import answer_question, answ_print
 from dotenv import load_dotenv
