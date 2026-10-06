@@ -1,0 +1,24 @@
+[project]
+name = "fin_agent"
+version = "0.1.0"
+description = "some financial agent"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "langchain>=1.4.2",
+    "langchain-gigachat>=0.5.1",
+    "langgraph>=1.2.12",
+    "langsmith>=0.14.1",
+    "pydantic>=2.13.5",
+    "pytest>=9.1.1",
+    "python-dotenv>=1.2.3",
+]
+
+[dependency-groups]
+dev = [
+    "ipykernel>=7.4.0",
+    "jupyter>=1.1.1",
+    "jupyterlab>=4.6.4",
+    "ruff>=0.16.9",
+    "ty>=0.0.84",
+]
